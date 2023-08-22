@@ -9,14 +9,15 @@ import pandas as pd
 import numpy as np
 from itertools import compress
 
-tmp=pd.read_csv('sample_time_series_single_policy.csv')
-novpar=pd.read_csv('novpar.csv',header=None).values
-novpar=.9*np.squeeze(np.sort(novpar,axis=0))
+all_data=pd.read_csv('sample_time_series_single_policy.csv')
+paria_data=pd.read_csv('par_sed.csv',header=None).values
+novpar=.9*np.squeeze(np.sort(paria_data[0:-2,0],axis=0))
+aprpar=.9*np.squeeze(np.sort(paria_data[0:-1,1],axis=0))
 
-trace=np.unique(tmp.trace_number)
-hydrology=np.unique(tmp.hydrology)
-demand=np.unique(tmp.demand)
-initial_condition=np.unique(tmp.initial_condition)
+trace=np.unique(all_data.trace_number)
+hydrology=np.unique(all_data.hydrology)
+demand=np.unique(all_data.demand)
+initial_condition=np.unique(all_data.initial_condition)
 
 run_matrix=np.zeros((len(trace)*len(hydrology)*len(demand)*len(initial_condition),4),dtype=np.int8)
 counter=0
@@ -31,15 +32,15 @@ for j1 in range(0,len(trace)):
                 counter=counter+1
 
 for j in range(0,np.size(run_matrix)):
-    run_true= (tmp.trace_number==trace[run_matrix[j,0]]) & (tmp.hydrology==hydrology[run_matrix[j,1]]) & (tmp.demand==demand[run_matrix[j,2]]) & (tmp.initial_condition==initial_condition[run_matrix[j,3]])
+    run_true= (all_data.trace_number==trace[run_matrix[j,0]]) & (all_data.hydrology==hydrology[run_matrix[j,1]]) & (all_data.demand==demand[run_matrix[j,2]]) & (all_data.initial_condition==initial_condition[run_matrix[j,3]])
     idx=list(compress(range(len(run_true)),run_true))
-    variable=tmp.time_series_slot_name.iloc[idx]
+    variable=all_data.time_series_slot_name.iloc[idx]
     idx2=list(compress(range(len(variable)), variable=='Powell Outflow'))
     idx3=list(compress(range(len(variable)), variable=='Powell Monthly Pool Elevation'))
     
-    t=tmp.timestep.iloc[idx].iloc[idx2]
-    Q_month=tmp.trace_value.iloc[idx].iloc[idx2].to_numpy()
-    Powell_elev=tmp.trace_value.iloc[idx].iloc[idx3].to_numpy()
+    t=all_data.timestep.iloc[idx].iloc[idx2]
+    Q_month=all_data.trace_value.iloc[idx].iloc[idx2].to_numpy()
+    Powell_elev=all_data.trace_value.iloc[idx].iloc[idx3].to_numpy()
     
     if j==0:
         export_Tmt_allruns=np.zeros((len(run_matrix),len(t)))
@@ -76,24 +77,39 @@ for j in range(0,np.size(run_matrix)):
     
     #%%
     octs=list(compress(range(len(M)),M==10))
+    novs=list(compress(range(len(M)),M==11))
+    juls=list(compress(range(len(M)),M==7))
+    mars=list(compress(range(len(M)),M==3))
+    aprs=list(compress(range(len(M)),M==4))
+    decs=list(compress(range(len(M)),M==12))
     
-    novembers=list(compress(range(len(M)),M==11))
-    julys=list(compress(range(len(M)),M==7))
-    HFE_sed=np.zeros(len(novembers))
-    HFE_implement=np.zeros(len(novembers))
-    t_nov=t.iloc[novembers]
+    HFE_fall_sed=np.zeros(len(novs))
+    HFE_fall_implement=np.zeros(len(novs))
+    HFE_spring_sed=np.zeros(len(aprs))
+    HFE_spring_implement=np.zeros(len(aprs))
+    
     
     if j==0:
+        t_nov=t.iloc[novs]
         HFE_sed_allruns=np.zeros((len(run_matrix),len(t_nov)))
         HFE_implement_allruns=np.zeros((len(run_matrix),len(t_nov)))
 
         
-    for i in range(0,len(novembers)):
-        HFE_sed[i]=np.max((0,1-np.where(np.concatenate((novpar,[10**20]),axis=0)>(export_Tmt[novembers[i]]-export_Tmt[julys[i]]))[0][0]/len(novpar)))
-        if Powell_elev[novembers[i]]<3550:
-            HFE_implement[i]=0
+    for i in range(0,len(novs)):
+        HFE_fall_sed[i]=np.max((0,1-np.where(np.concatenate((novpar,[10**20]),axis=0)>(export_Tmt[novs[i]]-export_Tmt[juls[i]]+294))[0][0]/len(novpar)))
+        if Powell_elev[octs[i]]<3550:
+            HFE_fall_implement[i]=0
         else:
-            HFE_implement[i]=HFE_sed[i]
+            HFE_fall_implement[i]=HFE_fall_sed[i]
             
-    HFE_sed_allruns[j,:]=HFE_sed
-    HFE_implement_allruns[j,:]=HFE_implement
+    for i in range(1,len(aprs)):
+        HFE_spring_sed[i]=np.max((0,1-np.where(np.concatenate((aprpar,[10**20]),axis=0)>(export_Tmt[aprs[i]]-export_Tmt[decs[i-1]]+294))[0][0]/len(aprpar)))
+        if Powell_elev[mars[i]]<3525:
+            HFE_spring_implement[i]=0
+        else:
+            HFE_spring_implement[i]=HFE_spring_sed[i]
+            
+    HFE_sed_allruns[j,:]=HFE_fall_sed+(1-HFE_fall_sed)*HFE_spring_sed
+    HFE_implement_allruns[j,:]=HFE_fall_implement+(1-HFE_fall_implement)*HFE_spring_implement
+
+    print(j/np.size(run_matrix))
