@@ -1,6 +1,6 @@
 # sediment_screening_tool
-# this is a draft as of 8/25/2023
-# NOT THE FINAL VERSION - NEEDS FURTHER TESTING TO BE SURE EVERYTHING IS CORRECT
+this is a draft as of 8/25/2023
+ NOT THE FINAL VERSION - NEEDS FURTHER TESTING TO BE SURE EVERYTHING IS CORRECT
 
 Basic sediment metrics
 1.	Marble Canyon sand mass balance – computed from a modified form of the Wright et al. (2010) sand routing model that can run on monthly volumes. Compute as a running total (most likely, not lower bound) for each trace. Does not include HFEs (because HFEs are not in annual/monthly data). Mass balance is computed on annual (calendar year) timestep.
