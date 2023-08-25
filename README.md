@@ -7,6 +7,7 @@ Basic sediment metrics
 2. LTEMP HFE metric. HFE implementation probability per year for sediment year (july 1st to june 30th). Probability that mass balance is sufficient to support a 60-hr HFE and the following constraints are met:
   - Assume Powell reservoir elevation must be at least 3550' for fall implementation and 3525' for spring, because HFE's have not been implemented below these elevations
   - All HFEs are assumed to be 40,000 cfs magnitude and at least 60 hr duration
+  - The annual HFE implementation probability will be used in Brad Butterfield's vegetation modeling
 3. SEIS metric - probably not included in the screening tool but computed in the code anyways. Similar to above but using the revised 1-yr sediment accounting window rather than LTEMP windows.
   - fall implementation same as above
   - spring implementation months (apr, may, jun) computed with 1-yr sediment accounting window and 3525' reservoir constraint
