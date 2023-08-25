@@ -3,7 +3,7 @@ this is a draft as of 8/25/2023
  NOT THE FINAL VERSION - NEEDS FURTHER TESTING TO BE SURE EVERYTHING IS CORRECT
 
 Basic sediment metrics
-1.	Marble Canyon sand mass balance – computed from a modified form of the Wright et al. (2010) sand routing model that can run on monthly volumes. Compute as a running total (most likely, not lower bound) for each trace. Does not include HFEs (because HFEs are not in annual/monthly data). Mass balance is computed on annual (calendar year) timestep.
+1.	Marble Canyon sand mass balance – computed from a modified form of the Wright et al. (2010) sand routing model that can run on monthly volumes. Uses average annual Paria sediment input (using most-likely value, not lower bound). Does not include HFEs (because HFEs are not in annual/monthly data). Mass balance is computed on annual (calendar year) timestep.
 2. LTEMP HFE metric. HFE implementation probability per year for sediment year (july 1st to june 30th). Probability that mass balance is sufficient to support a 60-hr HFE and the following constraints are met:
   - Assume Powell reservoir elevation must be at least 3550' for fall implementation and 3525' for spring, because HFE's have not been implemented below these elevations
   - All HFEs are assumed to be 40,000 cfs magnitude and at least 60 hr duration
@@ -19,7 +19,7 @@ Procedure:
   •	Assume a fixed bed composition equal to the median bed composition computed by the Wright et al. (2010) model for 2002-2023. (Without including HFE’s explicitly, the bed condition cannot be known because HFE’s coarsen the bed, therefore it is better to assume a fixed “typical” bed condition.)
   •	Calculate daily high and low flows based on LTEMP constraints
   •	Use relation from Wright et al. (2010) to compute the monthly sand export from Marble Canyon based on the bed condition specified above, and assuming 50% of the time at high flow and 50% at low flow.
-  •	Use the average monthly Paria sediment load to compute the cumulative monthly sand mass balance for Marble Canyon (assuming additional tributary sand inputs equal to 10% of Paria). The average monthly Paria sediment loads will be hard-coded into the script to      avoid reading an external file. 
+  •	Use the average monthly Paria sediment load to compute the cumulative monthly sand mass balance for Marble Canyon (assuming additional tributary sand inputs equal to 10% of Paria). The average monthly Paria sediment loads will be hard-coded into the script       to avoid reading an external file. 
   •	Output for sand mass balance metric: Annual mass balance (calendar year)
   •	Possible ways to turn this into a performance metric:
     - average annual mass balance across all years and all traces
